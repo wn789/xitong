@@ -2,6 +2,7 @@
  
 ## It can reinstall Debian, Ubuntu, CentOS system with network.
 ## Suitable for using by GRUB.
+## Default root password: Vicer
 ## Blog: https://moeclub.org
 ## Written By Vicer
  
@@ -484,14 +485,14 @@ mv -f $GRUBDIR/$GRUBFILE $GRUBDIR/$GRUBFILE.bak;
 }
  
 [[ "$GRUBOLD" == '1' ]] && {
-  CFG0="$(awk '/title /{print NR}' $GRUBDIR/$GRUBFILE|head -n 1)";
-  CFG1="$(awk '/title /{print NR}' $GRUBDIR/$GRUBFILE|head -n 2 |tail -n 1)";
+  CFG0="$(awk '/title[\ ]|title[\t]/{print NR}' $GRUBDIR/$GRUBFILE|head -n 1)";
+  CFG1="$(awk '/title[\ ]|title[\t]/{print NR}' $GRUBDIR/$GRUBFILE|head -n 2 |tail -n 1)";
   [[ -n $CFG0 ]] && [ -z $CFG1 -o $CFG1 == $CFG0 ] && sed -n "$CFG0,$"p $GRUBDIR/$GRUBFILE >/tmp/grub.new;
-  [[ -n $CFG0 ]] && [ -z $CFG1 -o $CFG1 != $CFG0 ] && sed -n "$CFG0,$CFG1"p $GRUBDIR/$GRUBFILE >/tmp/grub.new;
+  [[ -n $CFG0 ]] && [ -z $CFG1 -o $CFG1 != $CFG0 ] && sed -n "$CFG0,$[$CFG1-1]"p $GRUBDIR/$GRUBFILE >/tmp/grub.new;
   [[ ! -f /tmp/grub.new ]] && echo "Error! configure append $GRUBFILE. " && exit 1;
   sed -i "/title.*/c\title\ \'Install OS \[$DIST\ $VER\]\'" /tmp/grub.new;
   sed -i '/^#/d' /tmp/grub.new;
-  INSERTGRUB="$(awk '/title /{print NR}' $GRUBDIR/$GRUBFILE|head -n 1)"
+  INSERTGRUB="$(awk '/title[\ ]|title[\t]/{print NR}' $GRUBDIR/$GRUBFILE|head -n 1)"
 }
  
 [[ -n "$(grep 'linux.*/\|kernel.*/' /tmp/grub.new |awk '{print $2}' |tail -n 1 |grep '^/boot/')" ]] && Type='InBoot' || Type='NoBoot';
